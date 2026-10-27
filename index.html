@@ -1,0 +1,208 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#172033"><title>WFM</title><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icons/icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="WFM"><style>
+*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;margin:0;background:#f3f5f8;color:#202938}header{background:#172033;color:white;padding:16px max(16px,env(safe-area-inset-right)) 16px max(16px,env(safe-area-inset-left));position:sticky;top:0;z-index:2;box-shadow:0 2px 8px #0002}header h1{font-size:21px;margin:0 0 5px}header .sub{font-size:12px;color:#cbd5e1}main{max-width:900px;margin:16px auto;padding:0 12px 30px}.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px #0000000b}.login{max-width:420px;margin:60px auto}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}label{display:block;min-width:0;font-size:13px;font-weight:700}input{display:block;min-width:0;max-width:100%;width:100%;padding:12px;margin-top:6px;border:1px solid #cbd2de;border-radius:9px;font-size:16px;background:#fff;color:#202938}input[type="date"]{width:100%;min-width:0;max-width:100%;appearance:none;-webkit-appearance:none} .grid>label{min-width:0;overflow:hidden} input.invalid{border:2px solid #dc2626!important;background:#fff1f2!important;box-shadow:0 0 0 2px #fecaca!important}input:focus{outline:2px solid #93c5fd;outline-offset:1px}input.invalid:focus{outline-color:#dc2626}button{padding:12px 14px;border:0;border-radius:9px;background:#315efb;color:white;font-weight:700;font-size:15px;margin:5px 5px 0 0;cursor:pointer}.secondary{background:#e5e9f0;color:#263244}.danger{background:#fee2e2;color:#991b1b}.hidden{display:none!important}.tabs{display:flex;gap:8px;margin:12px 0}.tabs button{flex:1;margin:0}.summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.metric{background:#f5f7fa;padding:12px;border-radius:9px;font-size:12px;color:#586174}.metric strong{display:block;font-size:22px;color:#172033;margin-top:5px;overflow-wrap:anywhere}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:850px;font-size:12px}td,th{padding:9px;border-bottom:1px solid #e4e7ec;white-space:nowrap;text-align:right}td:first-child,th:first-child{text-align:left}th{background:#f5f6f8}.note{font-size:12px;color:#667085;line-height:1.6}.badge{background:#e8efff;color:#315efb;padding:4px 8px;border-radius:20px;font-size:12px}.section-title{margin:0 0 14px;font-size:18px}.form-actions{display:flex;flex-wrap:wrap;margin-top:14px}.amount input{font-variant-numeric:tabular-nums}.errors{background:#fff1f2;border:1px solid #fecdd3;color:#9f1239;padding:12px;border-radius:10px;margin-top:14px}.errors.ok{background:#ecfdf3;border-color:#a7f3d0;color:#166534}.errors ul{margin:8px 0 0;padding-left:20px}.errors li{margin:5px 0;line-height:1.5}.error-detail{font-weight:700}.errors .hint{font-size:12px;margin-top:8px}.error-cell{white-space:normal!important;text-align:left!important;min-width:240px;max-width:340px;color:#9f1239}.error-cell .oktext{color:#15803d}.editbtn{background:#e0f2fe;color:#075985}@media(min-width:650px){.summary{grid-template-columns:repeat(4,minmax(0,1fr))}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:360px){.grid{grid-template-columns:1fr}header h1{font-size:19px}}
+
+
+:root{--navy:#173b57;--blue:#246b91;--bg:#f3f6f8;--line:#dce4ea;--text:#17232d;--muted:#657582;--green:#16815d;--red:#b33d3d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;color:var(--text);padding-bottom:28px}
+header{background:linear-gradient(135deg,#173b57,#246b91);color:white;padding:22px 18px 20px;border-radius:0 0 22px 22px}
+header .eyebrow{font-size:12px;opacity:.8;letter-spacing:.08em}h1{font-size:22px;margin:5px 0 7px}header p{font-size:13px;margin:0;opacity:.9}
+main{max-width:720px;margin:auto;padding:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin:0 0 13px;box-shadow:0 3px 12px #163b5710}
+.card h2{font-size:16px;margin:0 0 13px}.sub{font-size:12px;color:var(--muted);margin-top:-7px;margin-bottom:12px}
+label{display:block;font-size:13px;font-weight:650;margin:12px 0 6px}
+input,textarea{font:inherit;width:100%;border:1px solid #cbd6df;border-radius:10px;padding:12px;background:#fff;color:var(--text);min-height:44px}
+input:focus,textarea:focus{outline:2px solid #8cc5e3;border-color:var(--blue)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid .full{grid-column:1/-1}
+.stampgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+button{font:inherit;border:0;border-radius:11px;padding:12px 13px;min-height:44px;font-weight:700;cursor:pointer}
+.stamp{background:#eaf3f8;color:#174f70;text-align:left;border:1px solid #cfe1ec}
+.stamp small{display:block;font-size:11px;font-weight:500;color:#557182;margin-bottom:4px}
+.stamp strong{font-size:16px}.primary{background:var(--navy);color:#fff;width:100%;margin-top:14px}.secondary{background:#e9eef2;color:#304454}.danger{background:#fff0f0;color:var(--red)}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:9px}.metric{background:#f2f7fa;border-radius:12px;padding:12px}.metric span{font-size:12px;color:var(--muted);display:block}.metric strong{font-size:21px;display:block;margin-top:3px}
+.note{font-size:12px;color:var(--muted);line-height:1.5}.record{border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:10px}.recordtop{display:flex;justify-content:space-between;gap:8px;align-items:start}.recordtop strong{font-size:14px}.recordtop small{color:var(--muted)}.recordstats{font-size:13px;line-height:1.8;margin-top:8px}.recordactions{display:flex;gap:8px;margin-top:10px}.recordactions button{flex:1;font-size:12px;min-height:38px;padding:8px}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar button{flex:1}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:22px 8px}.status{font-size:12px;color:var(--green);min-height:18px;margin-top:8px}
+@media(min-width:600px){main{padding:20px}.two{display:grid;grid-template-columns:1fr 1fr;gap:13px}.two .card{margin-bottom:13px}}
+
+
+.app-tabs{display:flex;gap:8px;max-width:900px;margin:12px auto;padding:0 12px}.app-tabs button{flex:1;margin:0;background:#e5e9f0;color:#263244}.app-tabs button.active{background:#315efb;color:#fff}.tab-panel.hidden{display:none!important}.truck-wrap{max-width:900px;margin:0 auto;padding:0 12px 28px}.truck-wrap header{position:static;border-radius:0 0 22px 22px;padding:18px}.truck-wrap main{max-width:720px;margin:auto;padding:14px 0}.truck-wrap input,.truck-wrap textarea{font:inherit;width:100%;border:1px solid #cbd6df;border-radius:10px;padding:12px;background:#fff;color:#17232d;min-height:44px;margin-top:0}.truck-wrap button{font:inherit;border-radius:11px;padding:12px 13px;min-height:44px;font-weight:700;cursor:pointer}.truck-wrap .primary{background:#173b57;color:#fff;width:100%;margin-top:14px}.truck-wrap .secondary{background:#e9eef2;color:#304454}.truck-wrap .danger{background:#fff0f0;color:#b33d3d}.truck-wrap .stamp{background:#eaf3f8;color:#174f70;text-align:left;border:1px solid #cfe1ec}.truck-wrap .card{box-shadow:0 3px 12px #163b5710}.truck-wrap .grid{grid-template-columns:repeat(2,minmax(0,1fr))}.truck-wrap .grid input{min-width:0}.truck-wrap .recordactions{display:flex;gap:8px}.truck-wrap .recordactions button{flex:1;font-size:12px;min-height:38px;padding:8px}.truck-wrap .status{font-size:12px;color:#16815d;min-height:18px;margin-top:8px}.truck-wrap .note{font-size:12px;color:#657582;line-height:1.5}.truck-wrap .summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.truck-wrap .metric{background:#f2f7fa;border-radius:12px;padding:12px}.truck-wrap .metric span{font-size:12px;color:#657582;display:block}.truck-wrap .metric strong{font-size:21px;display:block;margin-top:3px}.truck-wrap h1{font-size:22px;margin:5px 0 7px}.truck-wrap h2{font-size:16px;margin:0 0 13px}.truck-wrap .sub{font-size:12px;color:#657582;margin-top:-7px;margin-bottom:12px}.truck-wrap label{display:block;font-size:13px;font-weight:650;margin:12px 0 6px}.truck-wrap .stampgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.truck-wrap .toolbar{display:flex;gap:8px;flex-wrap:wrap}.truck-wrap .toolbar button{flex:1}.truck-wrap .record{border:1px solid #dce4ea;border-radius:12px;padding:13px;margin-top:10px}.truck-wrap .recordtop{display:flex;justify-content:space-between;gap:8px;align-items:start}.truck-wrap .recordstats{font-size:13px;line-height:1.8;margin-top:8px}.truck-wrap .empty{text-align:center;color:#657582;font-size:13px;padding:22px 8px}.truck-wrap .grid .full{grid-column:1/-1}
+@media(max-width:420px){.truck-wrap .grid{gap:8px}.truck-wrap .card{padding:13px}.app-tabs{gap:6px}.app-tabs button{font-size:13px;padding:10px 6px}}
+</style><script>if('serviceWorker'in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(e=>console.log('SW registration failed',e)));}</script></head><body>
+<div id="login" class="card login"><h1 style="text-align:center">WFM</h1><p>社員番号を入力してログイン</p><label>社員番号<input id="empId" inputmode="numeric" placeholder="例：10001" onkeydown="if(event.key==='Enter')loginUser()"></label><button style="width:100%;margin-top:15px" onclick="loginUser()">ログイン</button><p class="note">※社員番号による簡易ログインです。</p></div>
+<div id="app" class="hidden"><header><button style="float:right;background:#374151;padding:8px 10px;margin:0" onclick="logout()">ログアウト</button><h1>WFM</h1><div id="user" class="sub"></div></header><nav class="app-tabs hidden" id="appTabs"><button class="active" id="truckTabBtn" onclick="switchAppTab('truck')">🚚 距離・時間</button><button id="wfmTabBtn" onclick="switchAppTab('wfm')">📋 配送実績</button></nav><section id="truckPanel" class="tab-panel hidden"><div class="truck-wrap">
+  <section class="card">
+    <h2>今日の記録</h2>
+    <div class="grid">
+      <div><label for="workDate">日付</label><input id="workDate" type="date"></div>
+      <div><label for="routeName">コース・メモ（任意）</label><input id="routeName" placeholder="例：Aコース"></div>
+    </div>
+    <label>時刻を記録</label>
+    <div class="stampgrid">
+      <button class="stamp" data-time="depart"><small>センター出発</small><strong id="time-depart">未記録</strong></button>
+      <button class="stamp" data-time="first"><small>1件目到着</small><strong id="time-first">未記録</strong></button>
+      <button class="stamp" data-time="last"><small>最終納品</small><strong id="time-last">未記録</strong></button>
+      <button class="stamp" data-time="return"><small>センター帰着</small><strong id="time-return">未記録</strong></button>
+    </div>
+    <label for="breakMinutes">休憩時間（分）</label><input id="breakMinutes" type="number" min="0" step="1" placeholder="例：60">
+  </section>
+
+  <section class="card">
+    <h2>走行距離（km）</h2>
+    <p class="sub">各地点のオドメーター数値を入力してください。</p>
+    <div class="grid">
+      <div><label for="kmDepart">センター出発時</label><input id="kmDepart" type="number" min="0" step="0.1" placeholder="例：12540.2"></div>
+      <div><label for="kmFirst">1件目</label><input id="kmFirst" type="number" min="0" step="0.1" placeholder="例：12548.6"></div>
+      <div><label for="kmLast">最終納品先</label><input id="kmLast" type="number" min="0" step="0.1" placeholder="例：12591.4"></div>
+      <div><label for="kmReturn">センター帰着時</label><input id="kmReturn" type="number" min="0" step="0.1" placeholder="例：12610.8"></div>
+    </div>
+    <div class="summary" style="margin-top:13px">
+      <div class="metric"><span>総走行距離</span><strong id="totalKm">— km</strong></div>
+      <div class="metric"><span>出発〜1件目</span><strong id="firstKm">— km</strong></div>
+      <div class="metric"><span>1件目〜最終納品</span><strong id="deliveryKm">— km</strong></div>
+      <div class="metric"><span>最終納品〜帰着</span><strong id="returnKm">— km</strong></div>
+    </div>
+    <label for="memo">メモ（任意）</label><textarea id="memo" rows="2" placeholder="渋滞、待機、気づいたことなど"></textarea>
+    <button class="primary" id="saveBtn">この日の記録を保存</button>
+    <div class="status" id="status" role="status"></div>
+    <p class="note">※ 距離は両方の数値が入力されている区間だけ計算します。時刻は日付をまたぐ場合も経過時間として計算します。</p>
+  </section>
+
+  <section class="card">
+    <h2>記録一覧</h2>
+    <div class="toolbar">
+      <button class="secondary" id="exportBtn">CSVを書き出す</button>
+      <button class="secondary" id="newBtn">新しい記録</button>
+    </div>
+    <div id="records"></div>
+    <p class="note">保存先はこのブラウザ内です。ブラウザのデータ削除や端末変更で消えることがあるため、定期的にCSVを書き出してください。</p>
+  </section>
+</div></section><main id="wfmMain" class="hidden"><div class="tabs"><button onclick="tab('my')">記録一覧</button><button onclick="tab('input')">＋ 実績入力</button></div>
+<section id="input" class="card hidden"><h2 class="section-title">配送実績入力</h2><div class="grid"><label>日付<input id="date" type="date" required></label><label>配送件数<input id="deliveryCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>個配件数<input id="kohaCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>ペア個配件数<input id="pairKohaCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>実配件数<input id="actualCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>新規件数<input id="newCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>班件数<input id="teamCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>班配布枚数<input id="teamSheets" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label class="amount">供給金額（円）<input id="supplyAmount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label></div><div id="validation" class="errors ok" aria-live="polite">数値を入力すると、エラーを確認できます。</div><div class="form-actions"><button id="saveButton" onclick="addRecord()">記録を保存</button><button class="secondary" onclick="clearForm()">入力をクリア</button></div></section>
+<section id="my" class="card"><h2 class="section-title">記録一覧</h2><div id="mySummary" class="summary"></div><div class="tablewrap" style="margin-top:14px"><table><thead><tr><th>日付</th><th>配送件数</th><th>個配件数</th><th>ペア個配件数</th><th>実配件数</th><th>新規件数</th><th>班件数</th><th>班配布枚数</th><th>供給金額</th><th>エラー確認</th><th>操作</th></tr></thead><tbody id="myRows"></tbody></table></div><p id="myEmpty" class="note">まだ記録がありません。</p></section>
+</main></div>
+<script>(function(){
+
+const $=id=>document.getElementById(id);
+const fields=['workDate','routeName','breakMinutes','kmDepart','kmFirst','kmLast','kmReturn','memo'];
+const timeKeys=['depart','first','last','return'];
+let times={depart:'',first:'',last:'',return:''}, editingId=null;
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+$('workDate').value=today();
+const num=id=>{const v=$(id).value;return v===''?null:Number(v)};
+const fmt=n=>n===null||!Number.isFinite(n)?'—':`${n.toLocaleString('ja-JP',{maximumFractionDigits:1})} km`;
+function diff(a,b){const x=num(a),y=num(b);return x!==null&&y!==null&&y>=x?y-x:null}
+function duration(a,b){if(!times[a]||!times[b])return null;let [ah,am]=times[a].split(':').map(Number),[bh,bm]=times[b].split(':').map(Number);let m=bh*60+bm-(ah*60+am);if(m<0)m+=1440;return m}
+function fmtDuration(m){return m===null?'—':`${Math.floor(m/60)}時間${m%60}分`}
+function update(){
+ $('totalKm').textContent=fmt(diff('kmDepart','kmReturn'));
+ $('firstKm').textContent=fmt(diff('kmDepart','kmFirst'));
+ $('deliveryKm').textContent=fmt(diff('kmFirst','kmLast'));
+ $('returnKm').textContent=fmt(diff('kmLast','kmReturn'));
+ timeKeys.forEach(k=>$('time-'+k).textContent=times[k]||'未記録');
+}
+document.querySelectorAll('[data-time]').forEach(btn=>btn.addEventListener('click',()=>{
+ const k=btn.dataset.time, d=new Date();times[k]=`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;update();$('status').textContent=`${btn.innerText.split('\n')[0]}を ${times[k]} に記録しました`;
+}));
+['kmDepart','kmFirst','kmLast','kmReturn'].forEach(id=>$(id).addEventListener('input',update));
+function collect(){return {id:editingId||String(Date.now()),date:$('workDate').value||today(),route:$('routeName').value, times:{...times},breakMinutes:$('breakMinutes').value,kmDepart:$('kmDepart').value,kmFirst:$('kmFirst').value,kmLast:$('kmLast').value,kmReturn:$('kmReturn').value,memo:$('memo').value,updatedAt:new Date().toISOString()}}
+function getRecords(){try{return JSON.parse(localStorage.getItem('truckDistanceTimeRecords')||'[]')}catch(e){return []}}
+function setRecords(a){localStorage.setItem('truckDistanceTimeRecords',JSON.stringify(a))}
+function resetForm(){editingId=null;fields.forEach(id=>$(id).value='');$('workDate').value=today();times={depart:'',first:'',last:'',return:''};$('status').textContent='';update();$('saveBtn').textContent='この日の記録を保存'}
+$('saveBtn').addEventListener('click',()=>{
+ const r=collect();if(!r.date){$('status').textContent='日付を入力してください';return}
+ let arr=getRecords(),idx=arr.findIndex(x=>x.id===r.id);
+ if(idx>=0)arr[idx]=r;else arr.unshift(r);
+ setRecords(arr);$('status').textContent='保存しました';renderRecords();editingId=null;$('saveBtn').textContent='この日の記録を保存';
+});
+function loadRecord(r){editingId=r.id;$('workDate').value=r.date||today();$('routeName').value=r.route||'';$('breakMinutes').value=r.breakMinutes||'';$('kmDepart').value=r.kmDepart||'';$('kmFirst').value=r.kmFirst||'';$('kmLast').value=r.kmLast||'';$('kmReturn').value=r.kmReturn||'';$('memo').value=r.memo||'';times={depart:'',first:'',last:'',return:'',...(r.times||{})};$('saveBtn').textContent='変更を保存';$('status').textContent='記録を読み込みました';update();window.scrollTo({top:0,behavior:'smooth'})}
+function renderRecords(){
+ const arr=getRecords(),root=$('records');root.innerHTML='';
+ if(!arr.length){root.innerHTML='<div class="empty">まだ記録がありません。<br>上で時刻と距離を入力して保存してください。</div>';return}
+ arr.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+ arr.forEach(r=>{
+  const el=document.createElement('div');el.className='record';
+  const km=(r.kmDepart!==''&&r.kmReturn!==''&&Number(r.kmReturn)>=Number(r.kmDepart))?fmt(Number(r.kmReturn)-Number(r.kmDepart)):'距離未完了';
+  const t=r.times||{};
+  el.innerHTML=`<div class="recordtop"><div><strong></strong><br><small></small></div><strong class="km"></strong></div><div class="recordstats"></div><div class="recordactions"><button class="secondary edit">編集</button><button class="danger delete">削除</button></div>`;
+  el.querySelector('strong').textContent=r.date||'日付なし';el.querySelector('small').textContent=r.route||'コース名なし';el.querySelector('.km').textContent=km;
+  const stats=el.querySelector('.recordstats');
+  stats.textContent=`出発 ${t.depart||'—'}　1件目 ${t.first||'—'}\n最終 ${t.last||'—'}　帰着 ${t.return||'—'}\n休憩 ${r.breakMinutes||'—'} 分`;
+  stats.style.whiteSpace='pre-line';
+  el.querySelector('.edit').onclick=()=>loadRecord(r);
+  el.querySelector('.delete').onclick=()=>{if(confirm(`${r.date} の記録を削除しますか？`)){setRecords(getRecords().filter(x=>x.id!==r.id));renderRecords()}};
+  root.appendChild(el);
+ });
+}
+$('newBtn').addEventListener('click',()=>{resetForm();window.scrollTo({top:0,behavior:'smooth'})});
+$('exportBtn').addEventListener('click',()=>{
+ const arr=getRecords();if(!arr.length){alert('書き出す記録がありません');return}
+ const headers=['日付','コース・メモ','出発時刻','1件目時刻','最終納品時刻','帰着時刻','休憩(分)','出発距離(km)','1件目距離(km)','最終納品距離(km)','帰着距離(km)','総走行距離(km)','メモ'];
+ const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+ const rows=arr.map(r=>[r.date,r.route,r.times?.depart,r.times?.first,r.times?.last,r.times?.return,r.breakMinutes,r.kmDepart,r.kmFirst,r.kmLast,r.kmReturn,(r.kmDepart!==''&&r.kmReturn!==''&&Number(r.kmReturn)>=Number(r.kmDepart))?Number(r.kmReturn)-Number(r.kmDepart):'',r.memo].map(esc).join(','));
+ const blob=new Blob(['\ufeff'+[headers.map(esc).join(','),...rows].join('\r\n')],{type:'text/csv;charset=utf-8;'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='トラック距離時間メモ.csv';a.click();URL.revokeObjectURL(url);
+});
+update();renderRecords();
+
+$('workDate').addEventListener('change',()=>{const chosen=$('workDate').value||today();fields.filter(id=>id!=='workDate').forEach(id=>$(id).value='');times={depart:'',first:'',last:'',return:''};editingId=null;$('workDate').value=chosen;$('status').textContent='日付を変更したため、入力中の距離・時刻・休憩・メモをクリアしました。';$('saveBtn').textContent='この日の記録を保存';update();});
+
+})();</script><script>
+const STORAGE_KEY='deliveryWfmRecords';
+const fields=['deliveryCount','kohaCount','pairKohaCount','actualCount','newCount','teamCount','teamSheets','supplyAmount'];
+const labels={deliveryCount:'配送件数',kohaCount:'個配件数',pairKohaCount:'ペア個配件数',actualCount:'実配件数',newCount:'新規件数',teamCount:'班件数',teamSheets:'班配布枚数',supplyAmount:'供給金額'};
+let records=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'),employee='',editingId=null;
+// 数値欄をユーザーが明示的に入力・確認したかを記録。初期値の0だけでは検証を開始しない。
+let touchedFields=new Set();
+records.forEach(r=>{if(!r.id)r.id=makeId()});
+function makeId(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(36).slice(2)}
+function loginUser(){employee=document.getElementById('empId').value.trim();if(!employee)return alert('社員番号を入力してください');sessionStorage.setItem('wfmEmployee',employee);start()}
+function start(){document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.remove('hidden');document.getElementById('user').innerHTML='ログイン中：<span class="badge">社員番号 '+esc(employee)+'</span>';document.getElementById('date').value=localDate();document.getElementById('appTabs').classList.remove('hidden');switchAppTab('truck');tab('my');save()}
+function logout(){sessionStorage.removeItem('wfmEmployee');location.reload()}
+function tab(t){['input','my'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==t));if(t==='my')renderMy();if(t==='input')validateForm()}
+function localDate(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function num(id){return Math.max(0,Number(document.getElementById(id).value)||0)}
+function valuesFromForm(){const v={};fields.forEach(k=>v[k]=num(k));return v}
+function getErrors(r){
+ const e=[],delivery=Number(r.deliveryCount)||0,koha=Number(r.kohaCount)||0,pair=Number(r.pairKohaCount)||0,actual=Number(r.actualCount)||0,newc=Number(r.newCount)||0,sheets=Number(r.teamSheets)||0;
+ const sum2=koha+pair*2, sum3=koha+sheets+pair*2;
+ const mismatch=(sum)=>{const diff=sum-delivery;return diff>0?`${diff}件多い`:diff<0?`${Math.abs(diff)}件不足`:'一致'};
+ if(actual>delivery)e.push({code:1,fields:['actualCount','deliveryCount'],message:`① 実配件数 ${actual}件 が配送件数 ${delivery}件 を超えています（${actual-delivery}件超過）。`});
+ if(sum2!==delivery)e.push({code:2,fields:['kohaCount','pairKohaCount','deliveryCount'],message:`② 個配件数 ${koha}件 ＋ ペア個配件数 ${pair}件 × 2 ＝ ${sum2}件。配送件数は ${delivery}件のため、${mismatch(sum2)}です。`});
+ if(sum3!==delivery)e.push({code:3,fields:['kohaCount','teamSheets','pairKohaCount','deliveryCount'],message:`③ 個配件数 ${koha}件 ＋ 班配布枚数 ${sheets}枚 ＋ ペア個配件数 ${pair}件 × 2 ＝ ${sum3}件。配送件数は ${delivery}件のため、${mismatch(sum3)}です。`});
+ // 新規件数を含めると②または③の内訳が配送件数に一致する場合、④の可能性を表示
+ const sum2WithNew=sum2+newc, sum3WithNew=sum3+newc;
+ if(newc>0 && ((sum2WithNew===delivery && sum2!==delivery)||(sum3WithNew===delivery && sum3!==delivery))){
+   const cases=[]; if(sum2WithNew===delivery&&sum2!==delivery)cases.push(`②の内訳 ${sum2}件 ＋ 新規件数 ${newc}件 ＝ ${sum2WithNew}件`); if(sum3WithNew===delivery&&sum3!==delivery)cases.push(`③の内訳 ${sum3}件 ＋ 新規件数 ${newc}件 ＝ ${sum3WithNew}件`);
+   e.push({code:4,fields:['newCount','deliveryCount','kohaCount','pairKohaCount','teamSheets'],message:`④ 新規件数の計上方法を確認してください。${cases.join('／')}となり、配送件数 ${delivery}件と一致します。新規件数の扱いが内訳に反映されていない可能性があります。`});
+ }
+ return e;
+}
+function validateForm(){
+ const box=document.getElementById('validation');if(!box)return;
+ // 毎回いったん赤枠を解除。8つの数値欄をユーザーがすべて入力・確認するまでは検証しない。
+ fields.forEach(k=>document.getElementById(k).classList.remove('invalid'));
+ const allValuesPresent=!!document.getElementById('date').value && fields.every(k=>document.getElementById(k).value.trim()!=='');
+ const allFieldsTouched=fields.every(k=>touchedFields.has(k));
+ if(!allValuesPresent || !allFieldsTouched){
+   box.classList.add('ok');
+   box.innerHTML='<strong>入力待ち</strong><div class="note">配送件数だけでなく、8つすべての数値欄を入力・確認するとエラーチェックを開始します。0件の項目も、必要なら「0」を入力してください。</div>';
+   return;
+ }
+ const r={...valuesFromForm()},errs=getErrors(r);
+ const bad=new Set(errs.flatMap(x=>x.fields));bad.forEach(k=>{const el=document.getElementById(k);if(el)el.classList.add('invalid')});
+ box.classList.toggle('ok',errs.length===0);
+ box.innerHTML=errs.length?'<strong>入力エラーがあります（赤枠の項目を確認してください）</strong><ul>'+errs.map(x=>'<li><span class="error-detail">'+esc(x.message)+'</span></li>').join('')+'</ul><div class="hint">各エラーには、入力値・計算結果・配送件数との差を表示しています。</div>':'<strong>エラーはありません</strong><div class="note">すべての項目が入力され、設定されたチェック条件を満たしています。</div>';
+}
+function addRecord(){const date=document.getElementById('date').value;if(!date)return alert('日付を入力してください');const wasEditing=!!editingId;const r={...valuesFromForm(),id:editingId||makeId(),employee,date,createdAt:new Date().toISOString()};if(editingId){const ix=records.findIndex(x=>x.id===editingId&&String(x.employee)===String(employee));if(ix<0){editingId=null;return alert('訂正する記録が見つかりません。')}records[ix]={...records[ix],...r};}else records.unshift(r);save();clearForm();renderMy();tab('my');alert(wasEditing?'記録を訂正しました':'記録を保存しました');editingId=null;document.getElementById('saveButton').textContent='記録を保存'}
+function editRecord(id){const r=records.find(x=>x.id===id&&String(x.employee)===String(employee));if(!r)return alert('記録が見つかりません');editingId=id;touchedFields=new Set(fields);document.getElementById('date').value=r.date||localDate();fields.forEach(k=>document.getElementById(k).value=Number(r[k])||0);document.getElementById('saveButton').textContent='訂正内容を保存';tab('input');validateForm();window.scrollTo({top:0,behavior:'smooth'})}
+function clearForm(){editingId=null;touchedFields.clear();fields.forEach(k=>document.getElementById(k).value='');document.getElementById('date').value=localDate();document.getElementById('saveButton').textContent='記録を保存';validateForm()}
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(records))}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fmt(k,v){const n=Number(v)||0;return k==='supplyAmount'?n.toLocaleString('ja-JP')+'円':n.toLocaleString('ja-JP')}
+function renderMy(){const rs=records.filter(r=>String(r.employee)===String(employee));document.getElementById('mySummary').innerHTML=fields.map(k=>`<div class="metric">${labels[k]} 合計<strong>${fmt(k,rs.reduce((a,r)=>a+(Number(r[k])||0),0))}</strong></div>`).join('');document.getElementById('myRows').innerHTML=rs.map(r=>{const errs=getErrors(r);return `<tr><td>${esc(r.date||'')}</td>${fields.map(k=>`<td>${fmt(k,r[k])}</td>`).join('')}<td class="error-cell">${errs.length?'<ul>'+errs.map(x=>'<li>'+esc(x.message)+'</li>').join('')+'</ul>':'<span class="oktext">エラーなし</span>'}</td><td><button class="editbtn" onclick="editRecord('${esc(r.id)}')">訂正</button><button class="danger" onclick="deleteRecord('${esc(r.id)}')">削除</button></td></tr>`}).join('');document.getElementById('myEmpty').classList.toggle('hidden',rs.length>0)}
+function deleteRecord(id){const ix=records.findIndex(r=>r.id===id&&String(r.employee)===String(employee));if(ix<0)return;if(confirm('この記録を削除しますか？')){records.splice(ix,1);save();renderMy()}}
+fields.forEach(k=>{const el=document.getElementById(k);const markTouched=()=>{touchedFields.add(k);validateForm()};el.addEventListener('input',markTouched);el.addEventListener('change',markTouched)});
+document.getElementById('date').addEventListener('change',validateForm);
+if(sessionStorage.getItem('wfmEmployee')){employee=sessionStorage.getItem('wfmEmployee');start()}else{save()}
+
+function switchAppTab(which){document.getElementById('truckPanel').classList.toggle('hidden',which!=='truck');document.getElementById('wfmMain').classList.toggle('hidden',which!=='wfm');document.getElementById('truckTabBtn').classList.toggle('active',which==='truck');document.getElementById('wfmTabBtn').classList.toggle('active',which==='wfm');if(which==='wfm')tab('my');}
+</script></body></html>
