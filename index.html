@@ -19,7 +19,7 @@
 </script>
 <section id="deliveryPanel" class="hidden"><div class="tabs"><button onclick="tab('my')">記録一覧</button><button onclick="tab('input')">＋ 実績入力</button></div>
 <section id="dailyPanel" class="hidden">
-<div class="card"><h2 class="section-title">日付別まとめ</h2><p class="note">保存済みの「距離・時間」と「配送実績」を日付ごとにまとめて確認できます。この端末・このブラウザに保存されている記録が対象です。</p><label>確認する日付<input id="summaryDate" type="date"></label><div id="dailySummary" style="margin-top:14px"></div></div>
+<div class="card"><h2 class="section-title">日付別まとめ</h2><p class="note">保存済みの「距離・時間」と「配送実績」を日付ごとにまとめて確認できます。この端末・このブラウザに保存されている記録が対象です。</p><div id="dailyReadyStatus" class="note" role="status" aria-live="polite" style="margin:10px 0;padding:10px;border-radius:8px;background:#f1f5f9"></div><label>確認する日付<input id="summaryDate" type="date"></label><div id="dailySummary" style="margin-top:14px"></div></div>
 <div class="card"><h2 class="section-title">距離・時間の記録</h2><div id="dailyDistance"></div></div>
 <div class="card"><h2 class="section-title">配送実績の記録</h2><div id="dailyDelivery"></div></div>
 </section>
@@ -71,7 +71,7 @@ function validateForm(){
  box.classList.toggle('ok',errs.length===0);
  box.innerHTML=errs.length?'<strong>入力エラーがあります（赤枠の項目を確認してください）</strong><ul>'+errs.map(x=>'<li><span class="error-detail">'+esc(x.message)+'</span></li>').join('')+'</ul><div class="hint">各エラーには、入力値・計算結果・配送件数との差を表示しています。</div>':'<strong>エラーはありません</strong><div class="note">すべての項目が入力され、設定されたチェック条件を満たしています。</div>';
 }
-function addRecord(){const date=document.getElementById('date').value;if(!date)return alert('日付を入力してください');const wasEditing=!!editingId;const r={...valuesFromForm(),id:editingId||makeId(),employee,date,createdAt:new Date().toISOString()};if(editingId){const ix=records.findIndex(x=>x.id===editingId);if(ix<0){editingId=null;return alert('訂正する記録が見つかりません。')}records[ix]={...records[ix],...r};}else records.unshift(r);save();clearForm();renderMy();tab('my');alert(wasEditing?'記録を訂正しました':'記録を保存しました');editingId=null;document.getElementById('saveButton').textContent='記録を保存'}
+function addRecord(){const date=document.getElementById('date').value;if(!date)return alert('日付を入力してください');const wasEditing=!!editingId;const r={...valuesFromForm(),id:editingId||makeId(),employee,date,createdAt:new Date().toISOString()};if(editingId){const ix=records.findIndex(x=>x.id===editingId);if(ix<0){editingId=null;return alert('訂正する記録が見つかりません。')}records[ix]={...records[ix],...r};}else records.unshift(r);save();clearForm();renderMy();renderDailySummary();tab('my');alert(wasEditing?'記録を訂正しました':'記録を保存しました');editingId=null;document.getElementById('saveButton').textContent='記録を保存'}
 function editRecord(id){const r=records.find(x=>x.id===id);if(!r)return alert('記録が見つかりません');editingId=id;touchedFields=new Set(fields);document.getElementById('date').value=r.date||localDate();fields.forEach(k=>document.getElementById(k).value=Number(r[k])||0);document.getElementById('saveButton').textContent='訂正内容を保存';tab('input');validateForm();window.scrollTo({top:0,behavior:'smooth'})}
 function clearForm(){editingId=null;touchedFields.clear();fields.forEach(k=>document.getElementById(k).value='');document.getElementById('date').value=localDate();document.getElementById('saveButton').textContent='記録を保存';validateForm()}
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(records))}
@@ -87,6 +87,8 @@ function renderDailySummary(){
  let distances=[],deliveries=[];
  try{distances=JSON.parse(localStorage.getItem('truckDistanceTimeRecords')||'[]').filter(r=>(r.date||'')===date)}catch(e){}
  try{deliveries=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]').filter(r=>(r.date||'')===date)}catch(e){}
+ const readyEl=document.getElementById('dailyReadyStatus');
+ if(readyEl){const isToday=date===localDate();const both=distances.length>0&&deliveries.length>0;readyEl.textContent=both?(isToday?'本日の「距離・時間」と「配送実績」が両方保存されています。日別まとめを確認できます。':'この日付は両方の記録が保存されています。'):(isToday?`本日の記録状況：距離・時間 ${distances.length?'保存済み':'未保存'} ／ 配送実績 ${deliveries.length?'保存済み':'未保存'}。両方を保存すると、ここにまとめて表示されます。`:`この日付の記録状況：距離・時間 ${distances.length?'保存済み':'未保存'} ／ 配送実績 ${deliveries.length?'保存済み':'未保存'}。`);readyEl.style.background=both?'#e8f5e9':'#f1f5f9';}
  const total=(arr,key)=>arr.reduce((n,r)=>n+(Number(r[key])||0),0);
  const km=distances.reduce((n,r)=>n+(r.kmDepart!==''&&r.kmReturn!==''&&Number(r.kmReturn)>=Number(r.kmDepart)?Number(r.kmReturn)-Number(r.kmDepart):0),0);
  const dfields=[['deliveryCount','配送件数'],['kohaCount','個配件数'],['pairKohaCount','ペア個配件数'],['actualCount','実配件数'],['newCount','新規件数'],['teamCount','班件数'],['teamSheets','班配布枚数'],['supplyAmount','供給金額']];
@@ -95,6 +97,7 @@ function renderDailySummary(){
  document.getElementById('dailyDelivery').innerHTML=deliveries.length?deliveries.map(r=>`<div class="record"><div class="recordtop"><strong>配送実績</strong><small>${escDaily(r.date)}</small></div><div class="recordstats">${dfields.map(([k,label])=>`${label}：${k==='supplyAmount'?(Number(r[k])||0).toLocaleString('ja-JP')+'円':(Number(r[k])||0).toLocaleString('ja-JP')}`).join('　/　')}</div></div>`).join(''):'<p class="note">この日付の配送実績はありません。</p>';
 }
 document.getElementById('summaryDate').value=localDate();document.getElementById('summaryDate').addEventListener('change',renderDailySummary);
+window.addEventListener('storage',function(e){if(e.key==='truckDistanceTimeRecords'||e.key===STORAGE_KEY)renderDailySummary()});
 employee='';start()
 
 // 日付が変わったら、未保存の新規入力を空にして今日の日付へ更新する。保存済み記録は残す。
