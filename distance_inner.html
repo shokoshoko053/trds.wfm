@@ -45,10 +45,10 @@ button{font:inherit;border:0;border-radius:11px;padding:12px 13px;min-height:44p
     <p class="note">※ 社員番号は記録者を区別するための項目です。現在の公開版は簡易アプリのため、社員番号だけでは本人確認やアクセス制限はできません。</p>
     <label>時刻（距離入力時に自動記録）</label>
     <div class="time-edit-grid">
-      <div><label for="timeDepartInput">センター出発</label><input id="timeDepartInput" class="time-display" type="time" readonly aria-label="センター出発時刻" title="時刻修正ボタンから変更できます"></div>
-      <div><label for="timeFirstInput">1件目到着</label><input id="timeFirstInput" class="time-display" type="time" readonly aria-label="1件目到着時刻" title="時刻修正ボタンから変更できます"></div>
-      <div><label for="timeLastInput">最終納品</label><input id="timeLastInput" class="time-display" type="time" readonly aria-label="最終納品時刻" title="時刻修正ボタンから変更できます"></div>
-      <div><label for="timeReturnInput">センター帰着</label><input id="timeReturnInput" class="time-display" type="time" readonly aria-label="センター帰着時刻" title="時刻修正ボタンから変更できます"></div>
+      <div><label for="timeDepartInput">センター出発</label><input id="timeDepartInput" class="time-display" type="time" disabled aria-label="センター出発時刻" title="時刻修正ボタンから変更できます"></div>
+      <div><label for="timeFirstInput">1件目到着</label><input id="timeFirstInput" class="time-display" type="time" disabled aria-label="1件目到着時刻" title="時刻修正ボタンから変更できます"></div>
+      <div><label for="timeLastInput">最終納品</label><input id="timeLastInput" class="time-display" type="time" disabled aria-label="最終納品時刻" title="時刻修正ボタンから変更できます"></div>
+      <div><label for="timeReturnInput">センター帰着</label><input id="timeReturnInput" class="time-display" type="time" disabled aria-label="センター帰着時刻" title="時刻修正ボタンから変更できます"></div>
     </div>
     <button type="button" id="toggleTimeEdit" class="secondary" style="width:100%;margin:14px 0 8px;padding:13px;font-weight:700">時刻を修正</button>
     <p id="timeEditHelp" class="sub" style="display:none">修正したい時刻を選択し、完了ボタンを押してください。</p>
@@ -100,7 +100,7 @@ const timeInputMap={depart:'timeDepartInput',first:'timeFirstInput',last:'timeLa
 let timeEditMode=false;
 $('toggleTimeEdit').addEventListener('click',()=>{
   timeEditMode=!timeEditMode;
-  Object.values(timeInputMap).forEach(id=>{$(id).readOnly=!timeEditMode;});
+  Object.values(timeInputMap).forEach(id=>{$(id).disabled=!timeEditMode;});
   $('toggleTimeEdit').textContent=timeEditMode?'時刻修正を完了':'時刻を修正';
   $('timeEditHelp').style.display=timeEditMode?'block':'none';
   if(!timeEditMode){update();scheduleDraftSave();$('status').textContent='修正した時刻を保存しました（入力途中データ）';}
