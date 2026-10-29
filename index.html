@@ -17,15 +17,16 @@
  document.getElementById('distanceFrame').srcdoc=html;
 })();
 </script>
-<section id="deliveryPanel" class="hidden"><div class="tabs"><button onclick="tab('my')">記録一覧</button><button onclick="tab('input')">＋ 実績入力</button></div>
+<section id="deliveryPanel" class="hidden"><div class="tabs"><button onclick="tab('my')">記録一覧</button><button onclick="tab('input')">＋ 実績入力</button></div></section>
 <section id="dailyPanel" class="hidden">
 <div class="card"><h2 class="section-title">日付別まとめ</h2><p class="note">保存済みの「距離・時間」と「配送実績」を日付ごとにまとめて確認できます。この端末・このブラウザに保存されている記録が対象です。</p><div id="dailyReadyStatus" class="note" role="status" aria-live="polite" style="margin:10px 0;padding:10px;border-radius:8px;background:#f1f5f9"></div><label>確認する日付<input id="summaryDate" type="date"></label><div id="dailySummary" style="margin-top:14px"></div></div>
 <div class="card"><h2 class="section-title">距離・時間の記録</h2><div id="dailyDistance"></div></div>
 <div class="card"><h2 class="section-title">配送実績の記録</h2><div id="dailyDelivery"></div></div>
 </section>
+<section id="deliveryPanelContent" class="hidden">
 <section id="input" class="card hidden"><h2 class="section-title">配送実績入力</h2><div class="grid"><label>日付<input id="date" type="date" required></label><label>配送件数<input id="deliveryCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>個配件数<input id="kohaCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>ペア個配件数<input id="pairKohaCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>実配件数<input id="actualCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>新規件数<input id="newCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>班件数<input id="teamCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>班配布枚数<input id="teamSheets" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label class="amount">供給金額（円）<input id="supplyAmount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label></div><div id="validation" class="errors ok" aria-live="polite">数値を入力すると、エラーを確認できます。</div><div class="form-actions"><button id="saveButton" onclick="addRecord()">記録を保存</button><button class="secondary" onclick="clearForm()">入力をクリア</button></div></section>
 <section id="my" class="card"><h2 class="section-title">記録一覧</h2><div id="mySummary" class="summary"></div><div class="tablewrap" style="margin-top:14px"><table><thead><tr><th>日付</th><th>配送件数</th><th>個配件数</th><th>ペア個配件数</th><th>実配件数</th><th>新規件数</th><th>班件数</th><th>班配布枚数</th><th>供給金額</th><th>エラー確認</th><th>操作</th></tr></thead><tbody id="myRows"></tbody></table></div><p id="myEmpty" class="note">まだ記録がありません。</p></section>
-</section></main></div>
+</section></section></main></div>
 <script>
 const STORAGE_KEY='deliveryWfmRecords';
 const fields=['deliveryCount','kohaCount','pairKohaCount','actualCount','newCount','teamCount','teamSheets','supplyAmount'];
@@ -98,6 +99,8 @@ function renderDailySummary(){
 }
 document.getElementById('summaryDate').value=localDate();document.getElementById('summaryDate').addEventListener('change',renderDailySummary);
 window.addEventListener('storage',function(e){if(e.key==='truckDistanceTimeRecords'||e.key===STORAGE_KEY)renderDailySummary()});
+// iframe内の距離・時間保存は同一ページのstorageイベントが発火しないため、まとめ表示中は定期的に再読込する
+setInterval(()=>{const panel=document.getElementById('dailyPanel');if(panel&&!panel.classList.contains('hidden'))renderDailySummary()},1000);
 employee='';start()
 
 // 日付が変わったら、未保存の新規入力を空にして今日の日付へ更新する。保存済み記録は残す。
@@ -105,5 +108,5 @@ let deliveryDateAnchor=localDate();
 function checkDeliveryDate(){const now=localDate();if(now===deliveryDateAnchor)return;if(!editingId){fields.forEach(k=>document.getElementById(k).value='');touchedFields.clear();document.getElementById('date').value=now;document.getElementById('saveButton').textContent='記録を保存';validateForm();}deliveryDateAnchor=now;localStorage.setItem('wfmDeliveryViewDate',now);localStorage.setItem('wfmDeliveryView','input');const activeMy=!document.getElementById('my').classList.contains('hidden');if(activeMy)renderMy();}
 setInterval(checkDeliveryDate,30000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkDeliveryDate()});
-function mainTab(which){const d=which==='distance',v=which==='delivery',a=which==='daily';document.getElementById('distancePanel').classList.toggle('hidden',!d);document.getElementById('deliveryPanel').classList.toggle('hidden',!v);document.getElementById('dailyPanel').classList.toggle('hidden',!a);document.getElementById('distanceTabBtn').classList.toggle('active',d);document.getElementById('deliveryTabBtn').classList.toggle('active',v);document.getElementById('dailyTabBtn').classList.toggle('active',a);if(v){const savedDate=localStorage.getItem('wfmDeliveryViewDate');const savedView=savedDate===localDate()?localStorage.getItem('wfmDeliveryView'):'input';tab(savedView==='my'?'my':'input');}if(a)renderDailySummary();if(d){setTimeout(()=>{const f=document.getElementById('distanceFrame');if(f&&f.contentWindow)f.contentWindow.dispatchEvent(new Event('resize'));},50)}}
+function mainTab(which){const d=which==='distance',v=which==='delivery',a=which==='daily';document.getElementById('distancePanel').classList.toggle('hidden',!d);document.getElementById('deliveryPanel').classList.toggle('hidden',!v);document.getElementById('deliveryPanelContent').classList.toggle('hidden',!v);document.getElementById('dailyPanel').classList.toggle('hidden',!a);document.getElementById('distanceTabBtn').classList.toggle('active',d);document.getElementById('deliveryTabBtn').classList.toggle('active',v);document.getElementById('dailyTabBtn').classList.toggle('active',a);if(v){const savedDate=localStorage.getItem('wfmDeliveryViewDate');const savedView=savedDate===localDate()?localStorage.getItem('wfmDeliveryView'):'input';tab(savedView==='my'?'my':'input');}if(a)renderDailySummary();if(d){setTimeout(()=>{const f=document.getElementById('distanceFrame');if(f&&f.contentWindow)f.contentWindow.dispatchEvent(new Event('resize'));},50)}}
 </script></body></html>
