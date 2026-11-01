@@ -138,7 +138,7 @@ const COURSE_VEHICLE={"50":"2100","51":"2083","52":"9322","53":"2133","54":"2102
 const COURSE_OPTIONS=Object.keys(COURSE_VEHICLE);
 const VEHICLE_OPTIONS=[...Object.values(COURSE_VEHICLE),"9407","9667"];
 let activeWheelType=null,activeWheelValue='';
-function wheelLabel(id,value){return id==='routeName'?`${value}コース`:`${value}号車`}
+function wheelLabel(id,value){return value}
 function syncWheels(){
  $('courseTrigger').textContent=$('routeName').value?wheelLabel('routeName',$('routeName').value):'コースを選択';
  $('vehicleTrigger').textContent=$('vehicleNo').value?wheelLabel('vehicleNo',$('vehicleNo').value):'車番を選択';
