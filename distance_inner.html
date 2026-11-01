@@ -29,6 +29,20 @@ button{font:inherit;border:0;border-radius:11px;padding:12px 13px;min-height:44p
 .note{font-size:12px;color:var(--muted);line-height:1.5}.record{border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:10px}.recordtop{display:flex;justify-content:space-between;gap:8px;align-items:start}.recordtop strong{font-size:14px}.recordtop small{color:var(--muted)}.recordstats{font-size:13px;line-height:1.8;margin-top:8px}.recordactions{display:flex;gap:8px;margin-top:10px}.recordactions button{flex:1;font-size:12px;min-height:38px;padding:8px}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar button{flex:1}
 .empty{text-align:center;color:var(--muted);font-size:13px;padding:22px 8px}.status{font-size:12px;color:var(--green);min-height:18px;margin-top:8px}.save-indicator{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:#edf7f2;color:#176448;font-size:13px;margin:10px 0 12px}.save-dot{width:9px;height:9px;border-radius:50%;background:#16815d;flex:none}.save-indicator.pending{background:#fff7e5;color:#805a0b}.save-indicator.pending .save-dot{background:#d69b18}.time-edit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.time-edit-grid>div{min-width:0}.time-edit-grid label{font-size:13px;margin:12px 0 6px;line-height:1.3}.time-edit-grid input.time-display{display:block;box-sizing:border-box;width:100%;min-width:0;max-width:100%;min-height:44px;height:auto;padding:12px;font:inherit;font-size:16px;border-radius:10px;letter-spacing:normal;text-align:center;background:#f2f4f7;color:#344054;border:1px solid #cbd6df;cursor:default;appearance:none;-webkit-appearance:none}
 @media(min-width:600px){main{padding:20px}.two{display:grid;grid-template-columns:1fr 1fr;gap:13px}.two .card{margin-bottom:13px}}
+
+.wheel-field{min-width:0}
+.wheel-trigger{display:block;width:100%;min-height:44px;margin:0;text-align:left;background:#fff;color:var(--text);border:1px solid #cbd6df;border-radius:10px;padding:12px;font:inherit;font-size:16px;font-weight:500}
+.wheel-trigger:after{content:"⌄";float:right;color:var(--muted)}
+.wheel-modal{position:fixed;inset:0;background:#0007;z-index:20;display:none;align-items:center;justify-content:center;padding:20px}
+.wheel-modal.open{display:flex}
+.wheel-dialog{background:#fff;border-radius:18px;padding:18px;width:min(360px,100%);box-shadow:0 12px 40px #0004}
+.wheel-dialog h3{margin:0 0 12px;font-size:17px}
+.drum-wheel{height:210px;overflow-y:auto;overscroll-behavior:contain;scroll-snap-type:y mandatory;scrollbar-width:none;position:relative;background:linear-gradient(to bottom,#f7f9fb,#fff 35%,#fff 65%,#f7f9fb);padding:84px 8px;border-top:1px solid #e3e8ed;border-bottom:1px solid #e3e8ed;touch-action:pan-y}
+.drum-wheel::-webkit-scrollbar{display:none}
+.drum-option{height:42px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-size:16px;color:#8995a1;font-weight:600;user-select:none}
+.drum-option.selected{color:#173b57;font-size:21px;font-weight:800}
+.drum-wheel:after{content:"";position:absolute;left:7px;right:7px;top:84px;height:42px;border-top:2px solid #246b91;border-bottom:2px solid #246b91;border-radius:7px;pointer-events:none}
+.wheel-dialog .primary{margin-top:12px}
 </style>
 </head>
 <body>
@@ -38,8 +52,8 @@ button{font:inherit;border:0;border-radius:11px;padding:12px 13px;min-height:44p
     <h2>今日の記録</h2>
     <div class="grid">
       <div><label for="workDate">日付</label><input id="workDate" type="date"></div>
-      <div><label for="routeName">コース</label><input id="routeName" inputmode="numeric" autocomplete="off" placeholder="例：123"></div>
-      <div><label for="vehicleNo">車番</label><input id="vehicleNo" inputmode="numeric" autocomplete="off" placeholder="例：1234"></div>
+      <div class="wheel-field"><label>コース</label><input id="routeName" type="hidden"><button type="button" class="wheel-trigger" id="courseTrigger">コースを選択</button></div>
+      <div class="wheel-field"><label>車番</label><input id="vehicleNo" type="hidden"><button type="button" class="wheel-trigger" id="vehicleTrigger">車番を選択</button></div>
       <div><label for="employeeNo">社員番号（記録者）</label><input id="employeeNo" inputmode="numeric" autocomplete="off" placeholder="例：123456"></div>
     </div>
     <p class="note">※ 社員番号は記録者を区別するための項目です。現在の公開版は簡易アプリのため、社員番号だけでは本人確認やアクセス制限はできません。</p>
@@ -92,6 +106,7 @@ button{font:inherit;border:0;border-radius:11px;padding:12px 13px;min-height:44p
     <p class="note">保存先はこのブラウザ内です。ブラウザのデータ削除や端末変更で消えることがあるため、定期的にCSVを書き出してください。</p>
   </section>
 </main>
+<div class="wheel-modal" id="wheelModal"><div class="wheel-dialog"><h3 id="wheelTitle">選択</h3><div id="activeWheel" class="drum-wheel" role="listbox"></div><button type="button" class="primary" id="wheelDone">決定</button></div></div>
 <script>
 const $=id=>document.getElementById(id);
 const fields=['workDate','routeName','vehicleNo','employeeNo','breakMinutes','kmDepart','kmFirst','kmLast','kmReturn','fuelAmount','fuelDistance'];
@@ -119,6 +134,50 @@ Object.entries(timeInputMap).forEach(([key,id])=>{
 
 const DRAFT_KEY='truckDistanceTimeDraftV1';
 let draftTimer=null;
+const COURSE_VEHICLE={"50":"2100","51":"2083","52":"9322","53":"2133","54":"2102","55":"2011","56":"9760","57":"9300","58":"9781","59":"9228","60":"9956","61":"2120","62":"2205","63":"2045","64":"2178","65":"2206","66":"9982"};
+const COURSE_OPTIONS=Object.keys(COURSE_VEHICLE);
+const VEHICLE_OPTIONS=[...Object.values(COURSE_VEHICLE),"9407","9667"];
+let activeWheelType=null,activeWheelValue='';
+function wheelLabel(id,value){return id==='routeName'?`${value}コース`:`${value}号車`}
+function syncWheels(){
+ $('courseTrigger').textContent=$('routeName').value?wheelLabel('routeName',$('routeName').value):'コースを選択';
+ $('vehicleTrigger').textContent=$('vehicleNo').value?wheelLabel('vehicleNo',$('vehicleNo').value):'車番を選択';
+}
+function openWheel(id){
+ activeWheelType=id;activeWheelValue=$(id).value;
+ const options=id==='routeName'?COURSE_OPTIONS:VEHICLE_OPTIONS,root=$('activeWheel');
+ $('wheelTitle').textContent=id==='routeName'?'コースを選択':'車番を選択';
+ root.innerHTML='';
+ options.forEach(value=>{const item=document.createElement('div');item.className='drum-option';item.dataset.value=value;item.textContent=wheelLabel(id,value);root.appendChild(item)});
+ const index=options.indexOf(activeWheelValue);
+ activeWheelValue=options[index>=0?index:0];
+ root.scrollTop=(index>=0?index:0)*42;
+ root.querySelectorAll('.drum-option').forEach((el,i)=>el.classList.toggle('selected',i===(index>=0?index:0)));
+ root.onscroll=()=>{
+  const i=Math.max(0,Math.min(options.length-1,Math.round(root.scrollTop/42)));
+  activeWheelValue=options[i];
+  root.querySelectorAll('.drum-option').forEach((el,j)=>el.classList.toggle('selected',j===i));
+ };
+ $('wheelModal').classList.add('open');
+}
+function closeWheel(){
+ if(!activeWheelType)return;
+ const id=activeWheelType,value=activeWheelValue;
+ if(value){
+  $(id).value=value;
+  if(id==='routeName')$('vehicleNo').value=COURSE_VEHICLE[value];
+  else{
+   const course=Object.keys(COURSE_VEHICLE).find(c=>COURSE_VEHICLE[c]===value);
+   if(course)$('routeName').value=course;
+  }
+  syncWheels();scheduleDraftSave();
+ }
+ $('wheelModal').classList.remove('open');activeWheelType=null;
+}
+$('courseTrigger').addEventListener('click',()=>openWheel('routeName'));
+$('vehicleTrigger').addEventListener('click',()=>openWheel('vehicleNo'));
+$('wheelDone').addEventListener('click',closeWheel);
+$('wheelModal').addEventListener('click',e=>{if(e.target===$('wheelModal')){$('wheelModal').classList.remove('open');activeWheelType=null}});
 // コース・車番・社員番号は数字のみ入力できるようにする（先頭の0は保持）
 ['routeName','vehicleNo','employeeNo'].forEach(id=>$(id).addEventListener('input',()=>{const pos=$(id).selectionStart;const before=$(id).value;const after=before.replace(/[^0-9]/g,'');if(before!==after){$(id).value=after;try{$(id).setSelectionRange(pos-(before.length-after.length),pos-(before.length-after.length))}catch(e){}}}));
 const timeKeys=['depart','first','last','return'];
@@ -158,7 +217,7 @@ const kmTimeMap={kmDepart:'depart',kmFirst:'first',kmLast:'last',kmReturn:'retur
 function setSaveIndicator(message,pending=false){$('saveIndicatorText').textContent=message;$('saveIndicator').classList.toggle('pending',pending)}
 function currentDraft(){return {fields:Object.fromEntries(fields.map(id=>[id,$(id).value])),times:{...times},editingId,updatedAt:new Date().toISOString()}}
 function scheduleDraftSave(){setSaveIndicator('入力内容を保存中…',true);if(draftTimer)clearTimeout(draftTimer);draftTimer=setTimeout(()=>{try{localStorage.setItem(DRAFT_KEY,JSON.stringify(currentDraft()));setSaveIndicator('入力内容を自動保存しました（この端末内）')}catch(e){setSaveIndicator('自動保存できません。保存ボタンとCSV書き出しを使ってください',true)}},250)}
-function restoreDraft(){try{const raw=localStorage.getItem(DRAFT_KEY);autoDateAnchor=today();if(!raw){$('workDate').value=today();setSaveIndicator('自動保存オン：入力すると自動で保存されます');return}const d=JSON.parse(raw);const draftDate=d.fields&&d.fields.workDate?d.fields.workDate:'';if(draftDate&&draftDate!==today()){try{localStorage.removeItem(DRAFT_KEY)}catch(e){};resetForm();autoDateAnchor=today();setSaveIndicator('日付が変わったため前日の入力内容をリセットしました。保存済み記録はそのまま残っています');return}if(d.fields&&typeof d.fields==='object')fields.forEach(id=>{if(d.fields[id]!==undefined)$(id).value=d.fields[id]});times={depart:'',first:'',last:'',return:'',...(d.times||{})};editingId=d.editingId||null;update();$('saveBtn').textContent=editingId?'変更を保存':'この日の記録を保存';setSaveIndicator('前回の入力途中データを復元しました（保存ボタンで記録一覧に登録）');if(!editingId)scheduleDraftSave()}catch(e){$('workDate').value=today();setSaveIndicator('自動保存データを読み込めませんでした',true)}}
+function restoreDraft(){try{const raw=localStorage.getItem(DRAFT_KEY);autoDateAnchor=today();if(!raw){$('workDate').value=today();setSaveIndicator('自動保存オン：入力すると自動で保存されます');return}const d=JSON.parse(raw);const draftDate=d.fields&&d.fields.workDate?d.fields.workDate:'';if(draftDate&&draftDate!==today()){try{localStorage.removeItem(DRAFT_KEY)}catch(e){};resetForm();autoDateAnchor=today();setSaveIndicator('日付が変わったため前日の入力内容をリセットしました。保存済み記録はそのまま残っています');return}if(d.fields&&typeof d.fields==='object')fields.forEach(id=>{if(d.fields[id]!==undefined)$(id).value=d.fields[id]});times={depart:'',first:'',last:'',return:'',...(d.times||{})};editingId=d.editingId||null;syncWheels();update();$('saveBtn').textContent=editingId?'変更を保存':'この日の記録を保存';setSaveIndicator('前回の入力途中データを復元しました（保存ボタンで記録一覧に登録）');if(!editingId)scheduleDraftSave()}catch(e){$('workDate').value=today();setSaveIndicator('自動保存データを読み込めませんでした',true)}}
 fields.forEach(id=>{ $(id).addEventListener('input',scheduleDraftSave); $(id).addEventListener('change',scheduleDraftSave); });
 // 時刻表示欄は読み取り専用。時刻は距離欄の変更確定時にのみ更新します。
 window.addEventListener('pagehide',()=>{try{localStorage.setItem(DRAFT_KEY,JSON.stringify(currentDraft()))}catch(e){}});
@@ -171,14 +230,14 @@ setInterval(refreshWorkDate,30000);
 function collect(){return {id:editingId||String(Date.now()),date:$('workDate').value||today(),route:$('routeName').value,vehicleNo:$('vehicleNo').value.trim(),employeeNo:$('employeeNo').value.trim(),times:{...times},breakMinutes:$('breakMinutes').value,kmDepart:$('kmDepart').value,kmFirst:$('kmFirst').value,kmLast:$('kmLast').value,kmReturn:$('kmReturn').value,fuelAmount:$('fuelAmount').value,fuelDistance:$('fuelDistance').value,updatedAt:new Date().toISOString()}}
 function getRecords(){try{return JSON.parse(localStorage.getItem('truckDistanceTimeRecords')||'[]')}catch(e){return []}}
 function setRecords(a){localStorage.setItem('truckDistanceTimeRecords',JSON.stringify(a))}
-function resetForm(){editingId=null;fields.forEach(id=>$(id).value='');$('workDate').value=today();times={depart:'',first:'',last:'',return:''};$('status').textContent='';update();$('saveBtn').textContent='この日の記録を保存';scheduleDraftSave()}
+function resetForm(){editingId=null;fields.forEach(id=>$(id).value='');$('workDate').value=today();times={depart:'',first:'',last:'',return:''};syncWheels();$('status').textContent='';update();$('saveBtn').textContent='この日の記録を保存';scheduleDraftSave()}
 $('saveBtn').addEventListener('click',()=>{
  const r=collect();if(!r.date){$('status').textContent='日付を入力してください';return}
  let arr=getRecords(),idx=arr.findIndex(x=>x.id===r.id);
  if(idx>=0)arr[idx]=r;else arr.unshift(r);
  setRecords(arr);$('status').textContent='保存しました';renderRecords();editingId=null;$('saveBtn').textContent='この日の記録を保存';try{localStorage.removeItem(DRAFT_KEY)}catch(e){};setSaveIndicator('記録一覧に保存済みです')
 });
-function loadRecord(r){editingId=r.id;$('workDate').value=r.date||today();$('routeName').value=r.route||'';$('vehicleNo').value=r.vehicleNo||'';$('employeeNo').value=r.employeeNo||'';$('breakMinutes').value=r.breakMinutes||'';$('kmDepart').value=r.kmDepart||'';$('kmFirst').value=r.kmFirst||'';$('kmLast').value=r.kmLast||'';$('kmReturn').value=r.kmReturn||'';$('fuelAmount').value=r.fuelAmount||'';$('fuelDistance').value=r.fuelDistance||'';times={depart:'',first:'',last:'',return:'',...(r.times||{})};$('saveBtn').textContent='変更を保存';$('status').textContent='記録を読み込みました';update();scheduleDraftSave();window.scrollTo({top:0,behavior:'smooth'})}
+function loadRecord(r){editingId=r.id;$('workDate').value=r.date||today();$('routeName').value=r.route||'';$('vehicleNo').value=r.vehicleNo||'';$('employeeNo').value=r.employeeNo||'';$('breakMinutes').value=r.breakMinutes||'';$('kmDepart').value=r.kmDepart||'';$('kmFirst').value=r.kmFirst||'';$('kmLast').value=r.kmLast||'';$('kmReturn').value=r.kmReturn||'';$('fuelAmount').value=r.fuelAmount||'';$('fuelDistance').value=r.fuelDistance||'';times={depart:'',first:'',last:'',return:'',...(r.times||{})};syncWheels();$('saveBtn').textContent='変更を保存';$('status').textContent='記録を読み込みました';update();scheduleDraftSave();window.scrollTo({top:0,behavior:'smooth'})}
 function renderRecords(){
  const arr=getRecords(),root=$('records');root.innerHTML='';
  if(!arr.length){root.innerHTML='<div class="empty">まだ記録がありません。<br>上で時刻と距離を入力して保存してください。</div>';return}
