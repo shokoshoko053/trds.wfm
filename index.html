@@ -7,7 +7,7 @@
 
 .main-tabs{position:sticky;top:66px;z-index:3;background:#f3f5f8;padding:8px 0}.main-tabs .main-tab{background:#e5e9f0;color:#263244}.main-tabs .main-tab.active{background:#172033;color:#fff}#distancePanel{margin-top:8px}#deliveryPanel{margin-top:8px}.hidden{display:none!important}
 </style>
-<script>if('serviceWorker'in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(e=>console.log('SW registration failed',e)));}</script>
+<script>if('serviceWorker'in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'}).catch(e=>console.log('SW registration failed',e)));}</script>
 </head><body>
 <div id="app"><header><h1>WFM</h1></header><main><div class="tabs main-tabs"><button id="distanceTabBtn" class="main-tab active" onclick="mainTab('distance')">距離・時間</button><button id="deliveryTabBtn" class="main-tab" onclick="mainTab('delivery')">配送実績</button><button id="dailyTabBtn" class="main-tab" onclick="mainTab('daily')">日付別まとめ</button></div>
 <section id="distancePanel"><iframe id="distanceFrame" title="距離・時間" style="width:100%;height:calc(100vh - 155px);min-height:760px;border:0;border-radius:12px;background:#f3f6f8" loading="eager"></iframe></section><script>
