@@ -133,8 +133,11 @@ Object.entries(timeInputMap).forEach(([key,id])=>{
 });
 
 const DRAFT_KEY='truckDistanceTimeDraftV1';
-let draftTimer=null;
+// 日付をまたいでも保持するプロフィール。予備車は翌日に持ち越さず、コースの固定車両へ戻す。
+const PROFILE_KEY='truckDistanceTimeProfileV1';
 const COURSE_VEHICLE={"50":"2100","51":"2083","52":"9322","53":"2133","54":"2102","55":"2011","56":"9760","57":"9300","58":"9781","59":"9228","60":"9956","61":"2120","62":"2205","63":"2045","64":"2178","65":"2206","66":"9982"};
+function saveProfile(){try{const route=$('routeName').value;localStorage.setItem(PROFILE_KEY,JSON.stringify({routeName:route,employeeNo:$('employeeNo').value}));}catch(e){}}
+function restoreProfile(){try{const p=JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');if(p.routeName!==undefined)$('routeName').value=p.routeName||'';$('vehicleNo').value=COURSE_VEHICLE[$('routeName').value]||'';if(p.employeeNo!==undefined)$('employeeNo').value=p.employeeNo||'';syncWheels();}catch(e){}}
 const COURSE_OPTIONS=Object.keys(COURSE_VEHICLE);
 const VEHICLE_OPTIONS=[...Object.values(COURSE_VEHICLE),"9407","9667"];
 let activeWheelType=null,activeWheelValue='';
@@ -170,7 +173,7 @@ function closeWheel(){
    const course=Object.keys(COURSE_VEHICLE).find(c=>COURSE_VEHICLE[c]===value);
    if(course)$('routeName').value=course;
   }
-  syncWheels();scheduleDraftSave();
+  syncWheels();saveProfile();scheduleDraftSave();
  }
  $('wheelModal').classList.remove('open');activeWheelType=null;
 }
@@ -179,7 +182,7 @@ $('vehicleTrigger').addEventListener('click',()=>openWheel('vehicleNo'));
 $('wheelDone').addEventListener('click',closeWheel);
 $('wheelModal').addEventListener('click',e=>{if(e.target===$('wheelModal')){$('wheelModal').classList.remove('open');activeWheelType=null}});
 // コース・車番・社員番号は数字のみ入力できるようにする（先頭の0は保持）
-['routeName','vehicleNo','employeeNo'].forEach(id=>$(id).addEventListener('input',()=>{const pos=$(id).selectionStart;const before=$(id).value;const after=before.replace(/[^0-9]/g,'');if(before!==after){$(id).value=after;try{$(id).setSelectionRange(pos-(before.length-after.length),pos-(before.length-after.length))}catch(e){}}}));
+['routeName','vehicleNo','employeeNo'].forEach(id=>$(id).addEventListener('input',()=>{const pos=$(id).selectionStart;const before=$(id).value;const after=before.replace(/[^0-9]/g,'');if(before!==after){$(id).value=after;try{$(id).setSelectionRange(pos-(before.length-after.length),pos-(before.length-after.length))}catch(e){}}saveProfile();}));
 const timeKeys=['depart','first','last','return'];
 let times={depart:'',first:'',last:'',return:''}, editingId=null;
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
@@ -217,7 +220,7 @@ const kmTimeMap={kmDepart:'depart',kmFirst:'first',kmLast:'last',kmReturn:'retur
 function setSaveIndicator(message,pending=false){$('saveIndicatorText').textContent=message;$('saveIndicator').classList.toggle('pending',pending)}
 function currentDraft(){return {fields:Object.fromEntries(fields.map(id=>[id,$(id).value])),times:{...times},editingId,updatedAt:new Date().toISOString()}}
 function scheduleDraftSave(){setSaveIndicator('入力内容を保存中…',true);if(draftTimer)clearTimeout(draftTimer);draftTimer=setTimeout(()=>{try{localStorage.setItem(DRAFT_KEY,JSON.stringify(currentDraft()));setSaveIndicator('入力内容を自動保存しました（この端末内）')}catch(e){setSaveIndicator('自動保存できません。保存ボタンとCSV書き出しを使ってください',true)}},250)}
-function restoreDraft(){try{const raw=localStorage.getItem(DRAFT_KEY);autoDateAnchor=today();if(!raw){$('workDate').value=today();setSaveIndicator('自動保存オン：入力すると自動で保存されます');return}const d=JSON.parse(raw);const draftDate=d.fields&&d.fields.workDate?d.fields.workDate:'';if(draftDate&&draftDate!==today()){try{localStorage.removeItem(DRAFT_KEY)}catch(e){};resetForm();autoDateAnchor=today();setSaveIndicator('日付が変わったため前日の入力内容をリセットしました。保存済み記録はそのまま残っています');return}if(d.fields&&typeof d.fields==='object')fields.forEach(id=>{if(d.fields[id]!==undefined)$(id).value=d.fields[id]});times={depart:'',first:'',last:'',return:'',...(d.times||{})};editingId=d.editingId||null;syncWheels();update();$('saveBtn').textContent=editingId?'変更を保存':'この日の記録を保存';setSaveIndicator('前回の入力途中データを復元しました（保存ボタンで記録一覧に登録）');if(!editingId)scheduleDraftSave()}catch(e){$('workDate').value=today();setSaveIndicator('自動保存データを読み込めませんでした',true)}}
+function restoreDraft(){try{restoreProfile();const raw=localStorage.getItem(DRAFT_KEY);autoDateAnchor=today();if(!raw){$('workDate').value=today();syncWheels();setSaveIndicator('自動保存オン：入力すると自動で保存されます');return}const d=JSON.parse(raw);const draftDate=d.fields&&d.fields.workDate?d.fields.workDate:'';if(draftDate&&draftDate!==today()){try{localStorage.removeItem(DRAFT_KEY)}catch(e){};resetForm();autoDateAnchor=today();setSaveIndicator('日付が変わったため前日の入力内容をリセットしました。保存済み記録はそのまま残っています');return}if(d.fields&&typeof d.fields==='object')fields.forEach(id=>{if(d.fields[id]!==undefined)$(id).value=d.fields[id]});times={depart:'',first:'',last:'',return:'',...(d.times||{})};editingId=d.editingId||null;syncWheels();update();$('saveBtn').textContent=editingId?'変更を保存':'この日の記録を保存';setSaveIndicator('前回の入力途中データを復元しました（保存ボタンで記録一覧に登録）');if(!editingId)scheduleDraftSave()}catch(e){$('workDate').value=today();setSaveIndicator('自動保存データを読み込めませんでした',true)}}
 fields.forEach(id=>{ $(id).addEventListener('input',scheduleDraftSave); $(id).addEventListener('change',scheduleDraftSave); });
 // 時刻表示欄は読み取り専用。時刻は距離欄の変更確定時にのみ更新します。
 window.addEventListener('pagehide',()=>{try{localStorage.setItem(DRAFT_KEY,JSON.stringify(currentDraft()))}catch(e){}});
@@ -230,7 +233,7 @@ setInterval(refreshWorkDate,30000);
 function collect(){return {id:editingId||String(Date.now()),date:$('workDate').value||today(),route:$('routeName').value,vehicleNo:$('vehicleNo').value.trim(),employeeNo:$('employeeNo').value.trim(),times:{...times},breakMinutes:$('breakMinutes').value,kmDepart:$('kmDepart').value,kmFirst:$('kmFirst').value,kmLast:$('kmLast').value,kmReturn:$('kmReturn').value,fuelAmount:$('fuelAmount').value,fuelDistance:$('fuelDistance').value,updatedAt:new Date().toISOString()}}
 function getRecords(){try{return JSON.parse(localStorage.getItem('truckDistanceTimeRecords')||'[]')}catch(e){return []}}
 function setRecords(a){localStorage.setItem('truckDistanceTimeRecords',JSON.stringify(a))}
-function resetForm(){editingId=null;fields.forEach(id=>$(id).value='');$('workDate').value=today();times={depart:'',first:'',last:'',return:''};syncWheels();$('status').textContent='';update();$('saveBtn').textContent='この日の記録を保存';scheduleDraftSave()}
+function resetForm(){editingId=null;fields.filter(id=>!['workDate','routeName','vehicleNo','employeeNo'].includes(id)).forEach(id=>$(id).value='');$('workDate').value=today();restoreProfile();times={depart:'',first:'',last:'',return:''};syncWheels();$('status').textContent='';update();$('saveBtn').textContent='この日の記録を保存';scheduleDraftSave()}
 $('saveBtn').addEventListener('click',()=>{
  const r=collect();if(!r.date){$('status').textContent='日付を入力してください';return}
  let arr=getRecords(),idx=arr.findIndex(x=>x.id===r.id);
