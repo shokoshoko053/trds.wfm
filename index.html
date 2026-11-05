@@ -24,13 +24,13 @@
 <div class="card" id="dailyDeliveryCard"><h2 class="section-title">配送実績</h2><div id="dailyDelivery"></div></div>
 </section>
 <section id="deliveryPanelContent" class="hidden">
-<section id="input" class="card hidden"><h2 class="section-title">配送実績入力</h2><div class="grid"><label>日付<input id="date" type="date" required></label><label>配送件数<input id="deliveryCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>個配件数<input id="kohaCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>ペア個配件数<input id="pairKohaCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>実配件数<input id="actualCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>新規件数<input id="newCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>班件数<input id="teamCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>班配布枚数<input id="teamSheets" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label class="amount">供給金額（円）<input id="supplyAmount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label></div><div id="validation" class="errors ok" aria-live="polite">数値を入力すると、エラーを確認できます。</div><div class="form-actions"><button id="saveButton" onclick="addRecord()">記録を保存</button><button class="secondary" onclick="clearForm()">入力をクリア</button></div></section>
-<section id="my" class="card"><h2 class="section-title">記録一覧</h2><div id="mySummary" class="summary"></div><div class="tablewrap" style="margin-top:14px"><table><thead><tr><th>日付</th><th>配送件数</th><th>個配件数</th><th>ペア個配件数</th><th>実配件数</th><th>新規件数</th><th>班件数</th><th>班配布枚数</th><th>供給金額</th><th>エラー確認</th><th>操作</th></tr></thead><tbody id="myRows"></tbody></table></div><p id="myEmpty" class="note">まだ記録がありません。</p></section>
+<section id="input" class="card hidden"><h2 class="section-title">配送実績入力</h2><div class="grid"><label>日付<input id="date" type="date" required></label><label>配送件数<input id="deliveryCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>個配件数<input id="kohaCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>ペア個配件数<input id="pairKohaCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>実配件数<input id="actualCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>新規件数（作業表記載あり）<input id="newCountListed" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>新規件数（作業表記載なし）<input id="newCountUnlisted" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>班件数<input id="teamCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label>班配布枚数<input id="teamSheets" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label><label class="amount">供給金額（円）<input id="supplyAmount" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label></div><div id="validation" class="errors ok" aria-live="polite">数値を入力すると、エラーを確認できます。</div><div class="form-actions"><button id="saveButton" onclick="addRecord()">記録を保存</button><button class="secondary" onclick="clearForm()">入力をクリア</button></div></section>
+<section id="my" class="card"><h2 class="section-title">記録一覧</h2><div id="mySummary" class="summary"></div><div class="tablewrap" style="margin-top:14px"><table><thead><tr><th>日付</th><th>配送件数</th><th>個配件数</th><th>ペア個配件数</th><th>実配件数</th><th>新規件数（作業表記載あり）</th><th>新規件数（作業表記載なし）</th><th>班件数</th><th>班配布枚数</th><th>供給金額</th><th>エラー確認</th><th>操作</th></tr></thead><tbody id="myRows"></tbody></table></div><p id="myEmpty" class="note">まだ記録がありません。</p></section>
 </section></section></main></div>
 <script>
 const STORAGE_KEY='deliveryWfmRecords';
-const fields=['deliveryCount','kohaCount','pairKohaCount','actualCount','newCount','teamCount','teamSheets','supplyAmount'];
-const labels={deliveryCount:'配送件数',kohaCount:'個配件数',pairKohaCount:'ペア個配件数',actualCount:'実配件数',newCount:'新規件数',teamCount:'班件数',teamSheets:'班配布枚数',supplyAmount:'供給金額'};
+const fields=['deliveryCount','kohaCount','pairKohaCount','actualCount','newCountListed','newCountUnlisted','teamCount','teamSheets','supplyAmount'];
+const labels={deliveryCount:'配送件数',kohaCount:'個配件数',pairKohaCount:'ペア個配件数',actualCount:'実配件数',newCountListed:'新規件数（作業表記載あり）',newCountUnlisted:'新規件数（作業表記載なし）',teamCount:'班件数',teamSheets:'班配布枚数',supplyAmount:'供給金額'};
 let records=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'),employee='',editingId=null;
 // 数値欄をユーザーが明示的に入力・確認したかを記録。初期値の0だけでは検証を開始しない。
 let touchedFields=new Set();
@@ -42,22 +42,22 @@ function localDate(){const d=new Date();return `${d.getFullYear()}-${String(d.ge
 function num(id){return Math.max(0,Number(document.getElementById(id).value)||0)}
 function valuesFromForm(){const v={};fields.forEach(k=>v[k]=num(k));return v}
 function getErrors(r){
- const e=[],delivery=Number(r.deliveryCount)||0,koha=Number(r.kohaCount)||0,pair=Number(r.pairKohaCount)||0,actual=Number(r.actualCount)||0,newc=Number(r.newCount)||0,team=Number(r.teamCount)||0;
+ const e=[],delivery=Number(r.deliveryCount)||0,koha=Number(r.kohaCount)||0,pair=Number(r.pairKohaCount)||0,actual=Number(r.actualCount)||0,newc=Number(r.newCountUnlisted)||0,team=Number(r.teamCount)||0;
  const total=koha+pair+newc+team;
  const mismatch=total-delivery;
  if(actual>delivery)e.push({code:1,fields:['actualCount','deliveryCount'],message:`① 実配件数 ${actual}件 が配送件数 ${delivery}件 を超えています（${actual-delivery}件超過）。`});
- if(total!==delivery)e.push({code:2,fields:['kohaCount','pairKohaCount','newCount','teamCount','deliveryCount'],message:`② 個配件数 ${koha}件 ＋ ペア個配件数 ${pair}件 ＋ 新規件数 ${newc}件 ＋ 班件数 ${team}件 ＝ ${total}件。配送件数は ${delivery}件のため、${mismatch>0?`${mismatch}件多い`:`${Math.abs(mismatch)}件不足`}です。`});
+ if(total!==delivery)e.push({code:2,fields:['kohaCount','pairKohaCount','newCountUnlisted','teamCount','deliveryCount'],message:`② 個配件数 ${koha}件 ＋ ペア個配件数 ${pair}件 ＋ 新規件数（作業表記載なし） ${newc}件 ＋ 班件数 ${team}件 ＝ ${total}件。配送件数は ${delivery}件のため、${mismatch>0?`${mismatch}件多い`:`${Math.abs(mismatch)}件不足`}です。`});
  return e;
 }
 function validateForm(){
  const box=document.getElementById('validation');if(!box)return;
- // 毎回いったん赤枠を解除。8つの数値欄をユーザーがすべて入力・確認するまでは検証しない。
+ // 毎回いったん赤枠を解除。9つの数値欄をユーザーがすべて入力・確認するまでは検証しない。
  fields.forEach(k=>document.getElementById(k).classList.remove('invalid'));
  const allValuesPresent=!!document.getElementById('date').value && fields.every(k=>document.getElementById(k).value.trim()!=='');
  const allFieldsTouched=fields.every(k=>touchedFields.has(k));
  if(!allValuesPresent || !allFieldsTouched){
    box.classList.add('ok');
-   box.innerHTML='<strong>入力待ち</strong><div class="note">配送件数だけでなく、8つすべての数値欄を入力・確認するとエラーチェックを開始します。0件の項目も、必要なら「0」を入力してください。</div>';
+   box.innerHTML='<strong>入力待ち</strong><div class="note">配送件数だけでなく、9つすべての数値欄を入力・確認するとエラーチェックを開始します。0件の項目も、必要なら「0」を入力してください。</div>';
    return;
  }
  const r={...valuesFromForm()},errs=getErrors(r);
@@ -85,7 +85,7 @@ function renderDailySummary(){
  if(readyEl){const isToday=date===localDate();const both=distances.length>0&&deliveries.length>0;readyEl.textContent=both?(isToday?'本日の「距離・時間」と「配送実績」が両方保存されています。日別まとめを確認できます。':'この日付は両方の記録が保存されています。'):(isToday?`本日の記録状況：距離・時間 ${distances.length?'保存済み':'未保存'} ／ 配送実績 ${deliveries.length?'保存済み':'未保存'}。両方を保存すると、ここにまとめて表示されます。`:`この日付の記録状況：距離・時間 ${distances.length?'保存済み':'未保存'} ／ 配送実績 ${deliveries.length?'保存済み':'未保存'}。`);readyEl.style.background=both?'#e8f5e9':'#f1f5f9';}
  const total=(arr,key)=>arr.reduce((n,r)=>n+(Number(r[key])||0),0);
  const km=distances.reduce((n,r)=>n+(r.kmDepart!==''&&r.kmReturn!==''&&Number(r.kmReturn)>=Number(r.kmDepart)?Number(r.kmReturn)-Number(r.kmDepart):0),0);
- const dfields=[['deliveryCount','配送件数'],['kohaCount','個配件数'],['pairKohaCount','ペア個配件数'],['actualCount','実配件数'],['newCount','新規件数'],['teamCount','班件数'],['teamSheets','班配布枚数'],['supplyAmount','供給金額']];
+ const dfields=[['deliveryCount','配送件数'],['kohaCount','個配件数'],['pairKohaCount','ペア個配件数'],['actualCount','実配件数'],['newCountListed','新規件数（作業表記載あり）'],['newCountUnlisted','新規件数（作業表記載なし）'],['teamCount','班件数'],['teamSheets','班配布枚数'],['supplyAmount','供給金額']];
  const stops=[['センター出発','depart','kmDepart'],['1件目到着','first','kmFirst'],['最終納品','last','kmLast'],['センター帰着','return','kmReturn']];
  document.getElementById('dailySummary').innerHTML=`<div class="summary">${stops.map(([label,timeKey,kmKey])=>{const rows=distances.length?distances.map(r=>{const t=r.times||{};const time=t[timeKey]||'—';const value=r[kmKey]!==''&&r[kmKey]!=null?Number(r[kmKey]).toLocaleString('ja-JP')+' km':'— km';return `<div class="stop-value"><strong>${escDaily(time)}</strong><span>${escDaily(value)}</span></div>`}).join(''):'<div class="stop-value"><strong>—</strong><span>— km</span></div>';return `<div class="metric stop-metric">${label}${rows}</div>`}).join('')}</div>`;
  document.getElementById('dailyDelivery').innerHTML=deliveries.length?`<div class="summary">${dfields.map(([k,label])=>`<div class="metric">${label}合計<strong>${total(deliveries,k).toLocaleString('ja-JP')}${k==='supplyAmount'?'円':''}</strong></div>`).join('')}</div>`+deliveries.map(r=>`<div class="record"><div class="recordtop"><strong>配送実績</strong><small>${escDaily(r.date)}</small></div><div class="recordstats">${dfields.map(([k,label])=>`${label}：${k==='supplyAmount'?(Number(r[k])||0).toLocaleString('ja-JP')+'円':(Number(r[k])||0).toLocaleString('ja-JP')}`).join('　/　')}</div></div>`).join(''):'<p class="note">この日付の配送実績はありません。</p>';
